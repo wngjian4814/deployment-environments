@@ -1,12 +1,49 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-  "metadata": {
-    "_generator": {
-      "name": "bicep",
-      "version": "0.15.31.15270",
-      "templateHash": "17750672647523699609"
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "delayDeployment",
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": []
+        },
+        "parameters": {},
+        "outputs": {},
+        "copy": [
+          {
+            "name": "delayLoop",
+            "count": 1,
+            "input": {
+              "name": "[concat('Delay-', copyIndex())]",
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2021-04-01",
+              "properties": {
+                "mode": "Incremental",
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "resources": []
+                },
+                "parameters": {},
+                "outputs": {}
+              },
+              "copy": {
+                "name": "delaySecondsLoop",
+                "count": 120, // 2 minutes delay (2 minutes * 60 seconds)
+                "input": {
+                  "delaySeconds": "[copyIndex('delaySecondsLoop')]"
+                }
+              }
+            }
+          }
+        ]
+      }
     }
-  },
-  "resources": []
+  ]
 }
